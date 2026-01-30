@@ -2,29 +2,35 @@ import { useState } from "react";
 import "../style/form.css";
 
 function ContactForm() {
-  const [formData, setFormData] = useState({
-    name: "",
-    lastName: "",
-    email: "",
-  });
+  const [formData, setFormData] = useState({ name: "", lastName: "", email: "" });
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Formulario enviado:", formData);
-    alert("Formulario enviado (demo)");
+
+    try {
+      const response = await fetch("http://localhost:4000/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert(result.message);
+        setFormData({ name: "", lastName: "", email: "" });
+      } else {
+        alert("Error: " + result.error);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error enviando formulario");
+    }
   };
 
   return (
-    <form className="form" onSubmit={handleSubmit}>
-      <h2>Formulario de Contacto</h2>
-
+    <form onSubmit={handleSubmit}>
       <input
         type="text"
         name="name"
@@ -33,7 +39,6 @@ function ContactForm() {
         onChange={handleChange}
         required
       />
-
       <input
         type="text"
         name="lastName"
@@ -42,7 +47,6 @@ function ContactForm() {
         onChange={handleChange}
         required
       />
-
       <input
         type="email"
         name="email"
@@ -51,10 +55,10 @@ function ContactForm() {
         onChange={handleChange}
         required
       />
-
       <button type="submit">Confirmar</button>
     </form>
   );
 }
+
 
 export default ContactForm;
