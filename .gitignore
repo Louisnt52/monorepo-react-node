@@ -1,5 +1,6 @@
 # Node modules (backend y frontend)
 **/node_modules/
+.mysql_data
 
 # Logs
 **/logs
